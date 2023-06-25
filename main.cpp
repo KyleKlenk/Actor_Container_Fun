@@ -32,10 +32,22 @@ struct client_state {
 };
 
 behavior client(event_based_actor *self) {
+    self->set_down_handler([=](down_msg& dm) {
+
+        aout(self) << "\n.\n.\n.\n.\n.\n";
+        aout(self) << "Server Disconnected\n";
+        aout(self) << "\n.\n.\n.\n";
+        aout(self) << "Quitting Client\n";
+        self->quit();
+
+    });
+
+
     aout(self) << "Client Started\n";
     aout(self) << "Attempting To Connect To Server\n";
     auto server = self->system().middleman().remote_actor("localhost", 4444);
     if(!server) {aout(self) << "Failed To Connect To Server\n"; return {};}
+    self->monitor(*server);
     aout(self) << "Connected To Server\n";
     self->send(*server, "Hello From Client", self);
 
@@ -52,12 +64,39 @@ behavior client(event_based_actor *self) {
     };
 }
 
+struct server_state {
+    std::vector<caf::actor> actor_list;
+    int last_seen_actor_list_length = 0;
+};
 
-behavior server(event_based_actor *self) {
+
+behavior server(stateful_actor<server_state> *self) {
     aout(self) << "Server Started\n";
+    self->state.actor_list.push_back(self);
+
+    // self->set_down_handler([=](down_msg& dm) {
+    //     aout(self) << "\n.\n.\n.\n.\n.\n";
+    //     aout(self) << "Client Disconnected\n";
+    //     aout(self) << "\n.\n.\n.\n";
+    //     aout(self) << "Quitting Server\n";
+    //     self->quit();
+    // });
+
+
     return{
+        [=](caf::actor potential_client) {
+            aout(self) << "Server Received Connection Request\n";
+            self->state.actor_list.push_back(potential_client);
+        },
+
+
         [=](const std::string& arg, caf::actor return_addr) {
             aout(self) << "Server Received: " << arg << std::endl;
+            if (self->state.actor_list.size() != self->state.last_seen_actor_list_length) {
+                self->state.last_seen_actor_list_length++;
+
+                self->send(self->state.actor_list[self->state.actor_list.size() ])
+            }
 
             std::this_thread::sleep_for(std::chrono::seconds(5));
             self->send(return_addr, "Hello From Server", self);
