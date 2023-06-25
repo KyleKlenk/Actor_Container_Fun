@@ -1,4 +1,6 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
 #include <caf/all.hpp>
 #include "caf/io/all.hpp"
 
@@ -25,14 +27,27 @@ class config : public actor_system_config {
 };
 
 
+struct client_state {
+    strong_actor_ptr server;
+};
+
 behavior client(event_based_actor *self) {
     aout(self) << "Client Started\n";
     aout(self) << "Attempting To Connect To Server\n";
-
+    auto server = self->system().middleman().remote_actor("localhost", 4444);
+    if(!server) {aout(self) << "Failed To Connect To Server\n"; return {};}
+    aout(self) << "Connected To Server\n";
+    self->send(*server, "Hello From Client", self);
 
     return{
-        [=](const std::string& arg) {
+        [=](const std::string& arg, caf::actor return_addr) {
+
             aout(self) << "Client Received: " << arg << std::endl;
+
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            
+            self->send(return_addr, "Hello From Client", self);
+
         }
     };
 }
@@ -41,8 +56,11 @@ behavior client(event_based_actor *self) {
 behavior server(event_based_actor *self) {
     aout(self) << "Server Started\n";
     return{
-        [=](const std::string& arg) {
+        [=](const std::string& arg, caf::actor return_addr) {
             aout(self) << "Server Received: " << arg << std::endl;
+
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            self->send(return_addr, "Hello From Server", self);
         }
     };
 } 
@@ -52,12 +70,8 @@ void run_client(actor_system& system, const config& cfg) {
     scoped_actor self{system};
     
     auto server_actor = system.middleman().remote_actor("localhost", 4444);
-    if(!server_actor) {aout(self) << "Failed To Connect To Server\n"; return;}
-    aout(self) << "Connected To Server\n";
 
-    self->send(*server_actor, "Hello From Client");
-    
-    // self->spawn(client);
+    self->spawn(client);
 
 }
 
