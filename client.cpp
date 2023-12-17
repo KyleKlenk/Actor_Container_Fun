@@ -7,6 +7,7 @@ struct cleint_state {
 
 };
 
+
 behavior client_actor(stateful_actor<cleint_state> *self) {
   aout(self) << " ######## Starting Client Actor ######## \n";
 
@@ -22,10 +23,18 @@ behavior client_actor(stateful_actor<cleint_state> *self) {
   self->monitor(*server_actor);
   aout(self) << "Connected To Server\n";
   self->send(*server_actor, new_connection_v);
+
+  self->spawn(listener, *server_actor);
   
+
 
   return {
     [=](new_connection) {
+      auto sender_addr = actor_cast<actor>(self->current_sender());
+    },
+    [=](const std::string& arg) {
+      aout(self) << "Connected to Server\n";
+      aout(self) << "From Server: " << arg << "\n";
 
     }
   };

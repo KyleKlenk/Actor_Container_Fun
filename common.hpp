@@ -4,6 +4,11 @@
 #include "caf/io/all.hpp"
 #include "/root/Actor_Container_Fun/tomlplusplus/include/toml++/toml.h"
 #include <iostream>
+#include <string>
+#include <thread>
+#include <chrono>
+
+using namespace caf;
 
 using namespace caf;
 
@@ -19,7 +24,6 @@ std::optional<toml::table> parse_config(const std::string& filename) {
   }
 }
 
-
 behavior listener(event_based_actor* self, actor server_actor) {
   while(true) {
     std::string name;
@@ -27,7 +31,6 @@ behavior listener(event_based_actor* self, actor server_actor) {
     std::getline(std::cin, name);
     self->send(server_actor, name);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-
   }
   return {};
 
