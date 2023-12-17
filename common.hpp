@@ -3,6 +3,12 @@
 #include "caf/all.hpp"
 #include "caf/io/all.hpp"
 #include "/home/kyle/Actor_Container_Fun/tomlplusplus/include/toml++/toml.h"
+#include <iostream>
+#include <string>
+#include <thread>
+#include <chrono>
+
+using namespace caf;
 
 
 CAF_BEGIN_TYPE_ID_BLOCK(app, first_custom_type_id)
@@ -15,5 +21,17 @@ std::optional<toml::table> parse_config(const std::string& filename) {
   } catch (const toml::parse_error& err) {
     return std::nullopt;
   }
+}
+
+behavior listener(event_based_actor* self, actor server_actor) {
+  while(true) {
+    std::string name;
+    aout(self) << "Enter your name: ";
+    std::getline(std::cin, name);
+    self->send(server_actor, name);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+  return {};
+
 }
 

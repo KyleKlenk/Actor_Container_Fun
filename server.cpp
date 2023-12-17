@@ -31,7 +31,6 @@ behavior server_actor(stateful_actor<server_state> *self) {
   return {
     [=](new_connection) {
       aout(self) << "IDENTIFY YOURSELF!!!!\n";
-
     }
   };
 }
