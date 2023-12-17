@@ -30,8 +30,17 @@ behavior server_actor(stateful_actor<server_state> *self) {
 
   return {
     [=](new_connection) {
-      aout(self) << "IDENTIFY YOURSELF!!!!\n";
+      aout(self) << "Recieved Connection Request\n";
+      auto sender_addr = actor_cast<actor>(self->current_sender());
 
+      self->spawn(listener, sender_addr);
+
+      self->send(sender_addr, "Identify Yourself !!");
+    },
+
+    [=](std::string& name) {
+      aout(self) << name << " is trying to connect....\n";
+      
     }
   };
 }

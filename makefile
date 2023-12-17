@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++17 -O3 -Wl,-rpath,/home/kyle/Actor_Container_Fun/actor_install/lib
+CFLAGS = -std=c++17 -O3 -Wl,-rpath,/usr/local/lib/
 # LIBS = -L/home/kyle/Actor_Container_Fun/actor_install/lib -lcaf_core
 LIBS = -lcaf_core -lcaf_io
 # INCLUDES = -I/home/kyle/Actor_Container_Fun/actor_install/include
