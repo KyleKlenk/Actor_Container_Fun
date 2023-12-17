@@ -94,21 +94,21 @@ std::vector<int> vector_add(const std::vector<int>& a, const std::vector<int>& b
     return c;
 }
 
-int main() {
-    // srand(time(0));  // Seed the random number generator
-    int n = 4000;  // Size of the matrices
-    auto a = generate_random_matrix(n);
-    auto b = generate_random_matrix(n);
-    // auto c = vector_add_parallel(a, b);÷
-    // std::vector<int> c = vector_add(a, b)
+// int main() {
+// #include <iostream>
 
-    // std::vector<std::vector<int>> c = parallel_matrix_mult(a, b);
-    auto c = matrix_mult(a, b);
-    // for (const auto& row : c) {
-    //     for (const auto& elem : row) {
-    //         std::cout << elem << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
+long long fibonacci(int n) {
+    if (n <= 1) {
+        return n;
+    } else {
+        return fibonacci(n-1) + fibonacci(n-2);
+    }
+}
+
+int main() {
+    int n = 49; // This will take a long time to compute
+    for (int i = 0; i < 50000; ++i)
+        std::cout << "F(" << 5 << ") = " << fibonacci(30) << std::endl;
     return 0;
+// }
 }
