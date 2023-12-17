@@ -11,13 +11,21 @@ struct server_state {
 
 behavior server_actor(stateful_actor<server_state> *self) {
   aout(self) << " ######## Starting Server Actor ######## \n";
-  
-  uint16_t port = 4444;
+
+  auto config_opt = parse_config("./settings.toml");
+  auto config = *config_opt;
+
+  std::string server = config["server"].value_or("localhost");
+  aout(self) << "Server: " << server << "\n";
+  uint16_t port = config["port"].value_or(4444);
+  aout(self) << "Port: " << port << "\n";
 
   auto is_port = self->system().middleman().publish(self, port);
   if(!is_port) {
     aout(self) << "Failed To Publish Actor On Port: " << port << "\n"; return {};}
 
+
+  
 
 
   return {
@@ -34,4 +42,4 @@ void caf_main(actor_system& system) {
   self->spawn(server_actor);
 }
 
-CAF_MAIN(io::middleman)
+CAF_MAIN(io::middleman, id_block::app)

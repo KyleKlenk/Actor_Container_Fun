@@ -7,10 +7,10 @@ INCLUDES =
 
 all: server client
 
-server: server.cpp
+server: server.cpp common.hpp
 	$(CC) $(CFLAGS) $(INCLUDES) -o server server.cpp $(LIBS)
 
-client: client.cpp
+client: client.cpp common.hpp
 	$(CC) $(CFLAGS) $(INCLUDES) -o client client.cpp $(LIBS)
 # main: main.cpp
 # 	g++ $(CFLAGS) main.cpp -o main -fopenmp
